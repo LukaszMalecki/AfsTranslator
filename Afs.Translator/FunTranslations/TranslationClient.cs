@@ -18,6 +18,11 @@ namespace Afs.Translator
             {
                 throw new ArgumentOutOfRangeException(nameof(textToTranslate), "Empty value is not permited");
             }
+            if(textToTranslate.Length is < Constants.MinLenTextToTranslate or > Constants.MaxLenTextToTranslate)
+            {
+                throw new ArgumentOutOfRangeException(nameof(textToTranslate), 
+                    $"Length should be between {Constants.MinLenTextToTranslate} and {Constants.MaxLenTextToTranslate} inclusive");
+            }
             return null;
         }
     }
