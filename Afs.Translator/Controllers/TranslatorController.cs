@@ -1,4 +1,5 @@
-﻿using Afs.Translator.FunTranslations;
+﻿using Afs.Translator.DTOs;
+using Afs.Translator.FunTranslations;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,6 +12,13 @@ namespace Afs.Translator.Controllers
         {
             _client = client;
         }
+
+        public async Task<TranslationResponseBriefDto> GetTranslatedAsync(string textToTranslate, string translation)
+        {
+            var result = await _client.TranslateAsync(textToTranslate, translation);
+            return new TranslationResponseBriefDto() { TranslatedText = result.Contents.Translated };
+        }
+
         // GET: TranslatorController
         public ActionResult Index()
         {
