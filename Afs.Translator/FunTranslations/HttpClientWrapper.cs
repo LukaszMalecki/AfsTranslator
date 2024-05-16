@@ -12,10 +12,5 @@
         {
             return _httpClient.GetAsync(url);
         }
-
-        public Task<string> GetStringAsync(string url)
-        {
-            return _httpClient.GetStringAsync(url);
-        }
     }
 }

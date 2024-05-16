@@ -11,7 +11,6 @@ namespace Afs.Translator.Tests.Unit
         {
             _sut = new TranslationClient(
                 new HttpClientStub(
-                    TranslationClientTestsConstants.DefaultResponseFunc, 
                     TranslationClientTestsConstants.DefaultSuccessResponseMessageFunc)
                 );
         }
@@ -201,7 +200,6 @@ namespace Afs.Translator.Tests.Unit
             //Arrange
             var sut = new TranslationClient(
                 new HttpClientStub(
-                    TranslationClientTestsConstants.DefaultResponseFunc,
                     TranslationClientTestsConstants.DefaultSuccessResponseMessageFunc
                     )
                 );
@@ -217,7 +215,7 @@ namespace Afs.Translator.Tests.Unit
         public async Task TranslateAsync_ApiReturnsEmpty_InvalidOperationException()
         {
             //Arrange
-            var sut = new TranslationClient(new HttpClientStub(() => null!, () => null!));
+            var sut = new TranslationClient(new HttpClientStub(() => null!));
             var textToTranslate = TranslationClientTestsConstants.DefaultTextToTranslate;
             var translation = TranslationClientTestsConstants.DefaultTranslation;
             //Act
@@ -233,7 +231,6 @@ namespace Afs.Translator.Tests.Unit
             //Arrange
             var sut = new TranslationClient(
                 new HttpClientStub(
-                    TranslationClientTestsConstants.DefaultResponseFunc,
                     TranslationClientTestsConstants.DefaultNoTranslationResponseMessageFunc
                     )
                 );
