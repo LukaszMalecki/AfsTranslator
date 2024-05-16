@@ -2,7 +2,7 @@
 using System.Collections.Specialized;
 using System.Text.RegularExpressions;
 using System.Web;
-
+using Newtonsoft.Json;
 namespace Afs.Translator
 {
     public class TranslationClient:ITranslationClient
@@ -21,7 +21,7 @@ namespace Afs.Translator
             nameValueCollection[Constants.QueryTextName] = textToTranslate;
             uriBuilder.Query = nameValueCollection.ToString();
             string value = await _client.GetStringAsync(uriBuilder.Uri.AbsoluteUri);
-            return null;
+            return JsonConvert.DeserializeObject<FunTranslationsResponse>(value);
         }
         private void Validation(ref string textToTranslate, ref string translation)
         {

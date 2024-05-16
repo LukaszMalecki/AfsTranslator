@@ -8,7 +8,7 @@ namespace Afs.Translator
     public record Success
     {
         [JsonProperty("total")]
-        public string Total { get; set; }
+        public int Total { get; set; }
 
         public override string ToString()
         {

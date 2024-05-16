@@ -7,7 +7,7 @@ namespace Afs.Translator.Tests.Unit
         private readonly TranslationClient _sut;
         public TranslationClientTests()
         {
-            _sut = new TranslationClient(new HttpClientStub(() => "a"));
+            _sut = new TranslationClient(new HttpClientStub(TranslationClientTestsConstants.DefaultResponse));
         }
         [Fact]
         public async Task TranslateAsync_NullTextToTranslate_ArgumentNullException()
@@ -188,6 +188,21 @@ namespace Afs.Translator.Tests.Unit
                 Assert.Equal("translation", ex.ParamName);
                 Assert.StartsWith("Newline", ex.Message);
             }
+        }
+        [Fact]
+        public async Task TranslateAsync_DefaultInput_EqualsExpectedDefault()
+        {
+            //Arrange
+            var sut = new TranslationClient(new HttpClientStub(TranslationClientTestsConstants.DefaultResponse));
+            var textToTranslate = TranslationClientTestsConstants.DefaultTextToTranslate;
+            var translation = TranslationClientTestsConstants.DefaultTranslation;
+            var expectedResponse = TranslationClientTestsConstants.DefaultDeserializedResponse;
+            //Act
+            var translationResponse = await sut.TranslateAsync(textToTranslate, translation);
+            //Assert
+            //var ex = Assert.IsType<ArgumentNullException>(e);
+            Assert.Equal(expectedResponse, translationResponse);
+            //Assert.StartsWith("Null", ex.Message);
         }
 
     }

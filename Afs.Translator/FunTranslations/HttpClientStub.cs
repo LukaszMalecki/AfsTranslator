@@ -3,13 +3,14 @@
     public class HttpClientStub : IHttpClientWrapper
     {
         private readonly Func<string> _funcString;
-        public HttpClientStub(Func<string> func) 
+        public HttpClientStub(Func<string> funcJsonString) 
         {
-            _funcString = func;
+            _funcString = funcJsonString;
         }
-        public Task<string> GetStringAsync(string url)
+        public async Task<string> GetStringAsync(string url)
         {
-            return new Task<string>(_funcString);
+            var value = _funcString();
+            return value;
         }
     }
 }
