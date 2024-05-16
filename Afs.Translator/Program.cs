@@ -1,6 +1,20 @@
+using Afs.Translator;
+using Afs.Translator.FunTranslations;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.Services.AddSingleton<ITranslationClient>(_ =>
+{
+    bool isStubApi = bool.Parse(builder.Configuration["StubApi:IsActive"]);
+    if (isStubApi)
+    {
+        return new TranslationClient(new HttpClientStub(() => Constants.ExampleSuccessResponseMessage));
+    }
+    return new TranslationClient(new HttpClientWrapper());
+}
+    );
+
 builder.Services.AddControllersWithViews();
 
 var app = builder.Build();

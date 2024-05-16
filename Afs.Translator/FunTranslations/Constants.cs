@@ -15,5 +15,33 @@ namespace Afs.Translator.FunTranslations
         public const string TargetFileFormat = ".json";
         public const string QueryTextName = "text";
         public const int IncorrectTranslationStatusCode = 404;
+        public static string ExampleResponse = @"{
+            ""success"": {
+                ""total"": 1
+            },
+            ""contents"": {
+                ""translated"": ""h3ll0 W0R1d!"",
+                ""text"": ""Hello World!"",
+                ""translation"": ""leetspeak""
+            }
+        }";
+        public static FunTranslationsResponse ExampleDeserializedResponse = new FunTranslationsResponse()
+        {
+            Success = new Success()
+            {
+                Total = 1
+            },
+            Contents = new Contents()
+            {
+                Translated = "h3ll0 W0R1d!",
+                Text = "Hello World!",
+                Translation = "leetspeak"
+            }
+        };
+        public static HttpResponseMessage ExampleSuccessResponseMessage = new HttpResponseMessage()
+        {
+            StatusCode = System.Net.HttpStatusCode.OK,
+            Content = new StringContent(ExampleResponse, System.Text.Encoding.UTF8, "application/json")
+        };
     }
 }
