@@ -25,6 +25,21 @@ namespace Afs.Translator
             {
                 throw new ArgumentException("Newline characters are forbidden", nameof(textToTranslate));
             }
+
+            if(translation == null)
+            {
+                throw new ArgumentNullException(nameof(translation), "Null is not permitted");
+            }
+            translation = translation.Trim();
+            if (translation.Length is < Constants.MinLenTranslation or > Constants.MaxLenTranslation)
+            {
+                throw new ArgumentOutOfRangeException(nameof(translation),
+                    $"Length should be between {Constants.MinLenTranslation} and {Constants.MaxLenTranslation} inclusive");
+            }
+            if (Constants.AnyNewlineRegexFormat.Match(translation).Success)
+            {
+                throw new ArgumentException("Newline characters are forbidden", nameof(translation));
+            }
             return null;
         }
     }
