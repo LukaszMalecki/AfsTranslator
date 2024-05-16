@@ -234,7 +234,6 @@ namespace Afs.Translator.Tests.Unit
                     TranslationClientTestsConstants.DefaultNoTranslationResponseMessageFunc
                     )
                 );
-            //var sut = new TranslationClient(new HttpClientStub(TranslationClientTestsConstants.DefaultResponse));
             var textToTranslate = TranslationClientTestsConstants.DefaultTextToTranslate;
             var translation = "yeetspeak";
             var expectedResponse = TranslationClientTestsConstants.DefaultDeserializedResponse;
@@ -246,7 +245,24 @@ namespace Afs.Translator.Tests.Unit
             Assert.Equal("translation", ex.ParamName);
             Assert.StartsWith("Translation", ex.Message);
         }
-
-
+        [Fact]
+        public async Task TranslateAsync_CorrectParametersNullResponse_InvalidOperationException()
+        {
+            //Arrange
+            var sut = new TranslationClient(
+                new HttpClientStub(
+                    () => null!
+                    )
+                );
+            var textToTranslate = TranslationClientTestsConstants.DefaultTextToTranslate;
+            var translation = TranslationClientTestsConstants.DefaultTranslation;
+            var expectedResponse = TranslationClientTestsConstants.DefaultDeserializedResponse;
+            //Act
+            var e = await Record.ExceptionAsync(() =>
+                sut.TranslateAsync(textToTranslate, translation));
+            // Assert
+            var ex = Assert.IsType<InvalidOperationException>(e);
+            Assert.StartsWith("Null", ex.Message);
+        }
     }
 }
