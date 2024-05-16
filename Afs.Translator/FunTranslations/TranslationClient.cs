@@ -20,8 +20,30 @@ namespace Afs.Translator
             NameValueCollection nameValueCollection = HttpUtility.ParseQueryString("");
             nameValueCollection[Constants.QueryTextName] = textToTranslate;
             uriBuilder.Query = nameValueCollection.ToString();
-            string value = await _client.GetStringAsync(uriBuilder.Uri.AbsoluteUri);
-            return JsonConvert.DeserializeObject<FunTranslationsResponse>(value);
+
+            var response = await _client.GetAsync(uriBuilder.Uri.AbsoluteUri);
+            if (response == null)
+            {
+                throw new InvalidOperationException("Null response from the service");
+            }
+            if (response.IsSuccessStatusCode)
+            {
+                var responseContent = await response.Content.ReadAsStringAsync();
+                if (String.IsNullOrEmpty(responseContent))
+                {
+                    throw new InvalidOperationException("Null response from the service");
+                }
+                return JsonConvert.DeserializeObject<FunTranslationsResponse>(responseContent)!;
+            }
+            else if((int)response.StatusCode == Constants.IncorrectTranslationStatusCode)
+            {
+                throw new ArgumentOutOfRangeException(nameof(translation), "Translation service of such name doesn't exist");
+            }
+            else
+            {
+                var responseContent = await response.Content.ReadAsStringAsync();
+                throw new Exception($"Unhandled exception, content:{responseContent ?? ""}");
+            }
         }
         private void Validation(ref string textToTranslate, ref string translation)
         {

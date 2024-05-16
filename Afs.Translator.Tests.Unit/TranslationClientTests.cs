@@ -1,4 +1,6 @@
 using Afs.Translator.FunTranslations;
+using Microsoft.Extensions.Logging;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.ClientProtocol;
 using Xunit;
 namespace Afs.Translator.Tests.Unit
 {
@@ -7,7 +9,11 @@ namespace Afs.Translator.Tests.Unit
         private readonly TranslationClient _sut;
         public TranslationClientTests()
         {
-            _sut = new TranslationClient(new HttpClientStub(TranslationClientTestsConstants.DefaultResponse));
+            _sut = new TranslationClient(
+                new HttpClientStub(
+                    TranslationClientTestsConstants.DefaultResponseFunc, 
+                    TranslationClientTestsConstants.DefaultSuccessResponseMessageFunc)
+                );
         }
         [Fact]
         public async Task TranslateAsync_NullTextToTranslate_ArgumentNullException()
@@ -193,17 +199,57 @@ namespace Afs.Translator.Tests.Unit
         public async Task TranslateAsync_DefaultInput_EqualsExpectedDefault()
         {
             //Arrange
-            var sut = new TranslationClient(new HttpClientStub(TranslationClientTestsConstants.DefaultResponse));
+            var sut = new TranslationClient(
+                new HttpClientStub(
+                    TranslationClientTestsConstants.DefaultResponseFunc,
+                    TranslationClientTestsConstants.DefaultSuccessResponseMessageFunc
+                    )
+                );
             var textToTranslate = TranslationClientTestsConstants.DefaultTextToTranslate;
             var translation = TranslationClientTestsConstants.DefaultTranslation;
             var expectedResponse = TranslationClientTestsConstants.DefaultDeserializedResponse;
             //Act
             var translationResponse = await sut.TranslateAsync(textToTranslate, translation);
             //Assert
-            //var ex = Assert.IsType<ArgumentNullException>(e);
             Assert.Equal(expectedResponse, translationResponse);
-            //Assert.StartsWith("Null", ex.Message);
         }
+        [Fact]
+        public async Task TranslateAsync_ApiReturnsEmpty_InvalidOperationException()
+        {
+            //Arrange
+            var sut = new TranslationClient(new HttpClientStub(() => null!, () => null!));
+            var textToTranslate = TranslationClientTestsConstants.DefaultTextToTranslate;
+            var translation = TranslationClientTestsConstants.DefaultTranslation;
+            //Act
+            var e = await Record.ExceptionAsync(() =>
+                sut.TranslateAsync(TranslationClientTestsConstants.ValidTextToTranslate, translation));
+            //Assert
+            var ex = Assert.IsType<InvalidOperationException>(e);
+            Assert.StartsWith("Null", ex.Message);
+        }
+        [Fact]
+        public async Task TranslateAsync_MisspelledTranslation_ArgumentOutOfRangeException()
+        {
+            //Arrange
+            var sut = new TranslationClient(
+                new HttpClientStub(
+                    TranslationClientTestsConstants.DefaultResponseFunc,
+                    TranslationClientTestsConstants.DefaultNoTranslationResponseMessageFunc
+                    )
+                );
+            //var sut = new TranslationClient(new HttpClientStub(TranslationClientTestsConstants.DefaultResponse));
+            var textToTranslate = TranslationClientTestsConstants.DefaultTextToTranslate;
+            var translation = "yeetspeak";
+            var expectedResponse = TranslationClientTestsConstants.DefaultDeserializedResponse;
+            //Act
+            var e = await Record.ExceptionAsync(() =>
+                sut.TranslateAsync(textToTranslate, translation));
+            // Assert
+            var ex = Assert.IsType<ArgumentOutOfRangeException>(e);
+            Assert.Equal("translation", ex.ParamName);
+            Assert.StartsWith("Translation", ex.Message);
+        }
+
 
     }
 }

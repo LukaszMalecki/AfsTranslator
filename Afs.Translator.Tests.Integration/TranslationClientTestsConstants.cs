@@ -1,11 +1,11 @@
-﻿using System;
+﻿using Afs.Translator.FunTranslations;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Afs.Translator.FunTranslations;
 
-namespace Afs.Translator.Tests.Unit
+namespace Afs.Translator.Tests.Integration
 {
     public static class TranslationClientTestsConstants
     {
@@ -56,18 +56,5 @@ namespace Afs.Translator.Tests.Unit
             Content = new StringContent(DefaultResponse, System.Text.Encoding.UTF8, "application/json")
         };
         public static Func<HttpResponseMessage> DefaultSuccessResponseMessageFunc = () => DefaultSuccessResponseMessage;
-        public static string DefaultNoTranslationResponse = @"{
-            ""error"": {
-                ""code"": 404,
-                ""message"": ""Not Found""
-            }
-        }";
-        public static Func<string> DefaultNoTranslationResponseFunc = () => DefaultNoTranslationResponse;
-        public static HttpResponseMessage DefaultNoTranslationResponseMessage = new HttpResponseMessage()
-        {
-            StatusCode = System.Net.HttpStatusCode.NotFound,
-            Content = new StringContent(DefaultNoTranslationResponse, System.Text.Encoding.UTF8, "application/json")
-        };
-        public static Func<HttpResponseMessage> DefaultNoTranslationResponseMessageFunc = () => DefaultNoTranslationResponseMessage;
     }
 }
