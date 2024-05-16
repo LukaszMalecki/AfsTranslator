@@ -1,4 +1,5 @@
 ﻿using Afs.Translator.FunTranslations;
+using System.Text.RegularExpressions;
 
 namespace Afs.Translator
 {
@@ -12,16 +13,17 @@ namespace Afs.Translator
         {
             if (textToTranslate == null) 
             {
-                throw new ArgumentNullException(nameof(textToTranslate), "Null is not permited");
+                throw new ArgumentNullException(nameof(textToTranslate), "Null is not permitted");
             }
-            if (textToTranslate.Equals("")) 
-            {
-                throw new ArgumentOutOfRangeException(nameof(textToTranslate), "Empty value is not permited");
-            }
-            if(textToTranslate.Length is < Constants.MinLenTextToTranslate or > Constants.MaxLenTextToTranslate)
+            textToTranslate = textToTranslate.Trim();
+            if (textToTranslate.Length is < Constants.MinLenTextToTranslate or > Constants.MaxLenTextToTranslate)
             {
                 throw new ArgumentOutOfRangeException(nameof(textToTranslate), 
                     $"Length should be between {Constants.MinLenTextToTranslate} and {Constants.MaxLenTextToTranslate} inclusive");
+            }
+            if(Constants.AnyNewlineRegexFormat.Match(textToTranslate).Success)
+            {
+                throw new ArgumentException("Newline characters are forbidden", nameof(textToTranslate));
             }
             return null;
         }

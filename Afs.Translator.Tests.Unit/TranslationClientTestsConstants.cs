@@ -17,5 +17,6 @@ namespace Afs.Translator.Tests.Unit
             "aaaaaaaaaaaaaaaaaaaa";
         public const string text501Char = text500Char + "a";
         public const string text1Char = "a";
+        public const string text0Char = "";
     }
 }
