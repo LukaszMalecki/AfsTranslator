@@ -7,7 +7,7 @@ namespace Afs.Translator.Tests.Unit
         private readonly TranslationClient _sut;
         public TranslationClientTests()
         {
-            _sut = new TranslationClient();
+            _sut = new TranslationClient(new HttpClientStub(() => "a"));
         }
         [Fact]
         public async Task TranslateAsync_NullTextToTranslate_ArgumentNullException()
