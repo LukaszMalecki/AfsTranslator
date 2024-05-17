@@ -27,20 +27,16 @@ namespace Afs.Translator.Tests.Sintegration
                         () => TranslatorControllerTestsConstants.DefaultSuccessResponseMessage)
                 ), _context, _nowWrapper);
         }
-        /*protected void CreateSut(bool useDatabaseFixture = false)
+        protected Tuple<TranslatorDbContext, TranslatorController> ArrangeForTransactionalTests()
         {
-            TranslatorDbContext context = null!;
-            if(useDatabaseFixture)
-            {
-                context = Fixture.CreateContext();
-            }
-            _sut = new TranslatorController(
+            var context = Fixture.CreateContext();
+            var sut = new TranslatorController(
                 new TranslationClient(
                     new HttpClientStub(
                         () => TranslatorControllerTestsConstants.DefaultSuccessResponseMessage)
-                ), context);
-            _context = context;
-        }*/
+                ), _context, _nowWrapper);
+            return new Tuple<TranslatorDbContext, TranslatorController>(context, sut);
+        }
         [Fact]
         public async Task GetTranslatedAsync_NullTextToTranslate_ArgumentNullException()
         {
@@ -132,6 +128,36 @@ namespace Afs.Translator.Tests.Sintegration
                 Assert.IsType<BadRequestObjectResult>(translationResponse);
             else
                 Assert.IsType<OkObjectResult>(translationResponse);
+        }
+        [Fact]
+        public async Task TranslateApiAsync_ModelValid_ItemAddedToDbContextTranslationRequests()
+        {
+            //Arrange
+            (var context, var sut) = ArrangeForTransactionalTests();
+            var textToTranslate = TranslatorControllerTestsConstants.DefaultText;
+            var translation = TranslatorControllerTestsConstants.DefaultTranslation;
+            DateTime? requestDate = null;
+            int? translationId = null;
+            var expectedTranslated = TranslatorControllerTestsConstants.DefaultTranslated;
+            var inputDto = new TranslationRequestCreateDto()
+            {
+                TextToTranslate = textToTranslate,
+                TranslationName = translation,
+                RequestDate = requestDate,
+                TranslationId = translationId
+            };
+            int requestCountBefore = context.TranslationRequests.Count();
+            context.Database.BeginTransaction();
+            //Act
+            var translationResponse = await sut.TranslateApiAsync(inputDto);
+            context.ChangeTracker.Clear();
+            int requestCountAfter = context.TranslationRequests.Count();
+            var addedItem = context.TranslationRequests.FirstOrDefault(x => x.TextToTranslate.Equals(inputDto.TextToTranslate));
+            
+            //Assert
+            Assert.NotNull(addedItem);
+            Assert.Equal(requestCountBefore + 1, requestCountAfter);
+            Assert.Equal(inputDto.TextToTranslate, addedItem.TextToTranslate);
         }
     }
 }
