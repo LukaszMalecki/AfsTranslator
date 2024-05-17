@@ -16,7 +16,7 @@ namespace Afs.Translator.Tests.Unit
         public TranslatorControllerTests(TestDatabaseFixture fixture)
         {
             Fixture = fixture;
-            CreateSut(false);
+            CreateSut(true);
         }
         protected void CreateSut(bool useDatabaseFixture = false)
         {
@@ -81,6 +81,39 @@ namespace Afs.Translator.Tests.Unit
             //Assert
             Assert.NotNull(translationResponse);
             Assert.IsType<BadRequestObjectResult>(translationResponse);
+        }
+        [Theory]
+        [InlineData(null, null, true)]
+        [InlineData("notthere", null, false)]
+        [InlineData("notthere", TranslatorControllerTestsConstants.DefaultTranslationId, false)]
+        [InlineData(null, 50000, false)]
+        [InlineData(TranslatorControllerTestsConstants.DefaultTranslation, null, true)]
+        [InlineData(null, TranslatorControllerTestsConstants.DefaultTranslationId, true)]
+        [InlineData(TranslatorControllerTestsConstants.DefaultTranslation, 50000, true)]
+        public async Task TranslateApiAsync_SpecifiedTranslationNotFoundInDatabase_BadRequestObjectResultIfInvalid(string? translationName, int? transId, bool isValid)
+        {
+            //CreateSut(true);
+            //Arrange
+            var textToTranslate = TranslatorControllerTestsConstants.DefaultText;
+            var translation = translationName;
+            DateTime? requestDate = null;
+            int? translationId = transId;
+            var expectedTranslated = TranslatorControllerTestsConstants.DefaultTranslated;
+            var inputDto = new TranslationRequestCreateDto()
+            {
+                TextToTranslate = textToTranslate,
+                TranslationName = translation,
+                RequestDate = requestDate,
+                TranslationId = translationId
+            };
+            //Act
+            var translationResponse = await _sut.TranslateApiAsync(inputDto);
+            //Assert
+            Assert.NotNull(translationResponse);
+            if(!isValid)
+                Assert.IsType<BadRequestObjectResult>(translationResponse);
+            else
+                Assert.IsType<OkObjectResult>(translationResponse);
         }
     }
 }

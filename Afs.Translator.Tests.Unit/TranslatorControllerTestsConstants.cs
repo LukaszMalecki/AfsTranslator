@@ -12,6 +12,7 @@ namespace Afs.Translator.Tests.Unit
         public const string DefaultTranslated = "h3ll0 W0R1d!";
         public const string DefaultText = "Hello World!";
         public const string DefaultTranslation = "leetspeak";
+        public const int DefaultTranslationId = 1;
         public static string DefaultResponse = @"{
             ""success"": {
                 ""total"": 1
