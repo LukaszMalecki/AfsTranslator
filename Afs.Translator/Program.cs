@@ -1,5 +1,7 @@
 using Afs.Translator;
+using Afs.Translator.Data;
 using Afs.Translator.FunTranslations;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,10 +18,18 @@ builder.Services.AddSingleton<ITranslationClient>(_ =>
     );
 
 builder.Services.AddControllersWithViews();
+builder.Services.AddDbContextPool<TranslatorDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("TranslatorDb")));
 
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
+using(var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<TranslatorDbContext>();
+    dbContext.Database.EnsureCreated();
+}
+
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");

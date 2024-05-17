@@ -16,7 +16,7 @@ namespace Afs.Translator.Tests.Unit
                 new TranslationClient(
                     new HttpClientStub(
                         () => TranslatorControllerTestsConstants.DefaultSuccessResponseMessage)
-                ));
+                ), null!);
         }
         [Fact]
         public async Task GetTranslatedAsync_NullTextToTranslate_ArgumentNullException()

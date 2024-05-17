@@ -5,15 +5,18 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Afs.Translator.Models;
+using Afs.Translator.Data;
 
 namespace Afs.Translator.Controllers
 {
     public class TranslatorController : Controller
     {
         private ITranslationClient _client;
-        public TranslatorController(ITranslationClient client) 
+        private readonly TranslatorDbContext _context;
+        public TranslatorController(ITranslationClient client, TranslatorDbContext context) 
         {
             _client = client;
+            _context = context;
         }
         [NonAction]
         public async Task<TranslationResponseBriefDto> GetTranslatedAsync(string textToTranslate, string translation)
@@ -84,8 +87,10 @@ namespace Afs.Translator.Controllers
             //return new JsonResult("aaa");
         }*/
         // GET: TranslatorController
-        public ActionResult Index()
+        public async Task<ActionResult> Index()
         {
+            var translation = await _context.Translations.FindAsync(1);
+            ViewBag.Test = translation.TranslationName;
             return View();
         }
 
