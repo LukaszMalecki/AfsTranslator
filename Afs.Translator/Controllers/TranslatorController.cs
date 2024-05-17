@@ -36,12 +36,16 @@ namespace Afs.Translator.Controllers
             {
                 return BadRequest(ModelState.ToDictionary(x => x.Key, x => x.Value!.Errors));
             }
-            Tuple<bool, string> VerificationResult = await VerifyTranslationAsync(translationRequest);
+            Tuple<bool, string, int> VerificationResult = await VerifyTranslationAsync(translationRequest);
             if (!VerificationResult.Item1)
             {
                 return BadRequest(VerificationResult.Item2);
             }
+            translationRequest.TranslationName = VerificationResult.Item2;
+            translationRequest.TranslationId = VerificationResult.Item3;
+
             translationRequest.RequestDate = AdjustedDateTime(translationRequest.RequestDate);
+
             try
             {
                 var result = await GetTranslatedAsync(translationRequest.TextToTranslate, VerificationResult.Item2);
@@ -52,32 +56,33 @@ namespace Afs.Translator.Controllers
                 return BadRequest($"{ex.GetType().Name}: {ex.Message}");
             }
         }
-        protected async Task<Tuple<bool, string>> VerifyTranslationAsync(TranslationRequestCreateDto translationRequest)
+        protected async Task<Tuple<bool, string, int>> VerifyTranslationAsync(TranslationRequestCreateDto translationRequest)
         {
             return await VerifyTranslationAsync(translationRequest.TranslationName, translationRequest.TranslationId);
         }
-        protected async Task<Tuple<bool, string>> VerifyTranslationAsync(string? translationName ,int? translationId)
+        protected async Task<Tuple<bool, string, int>> VerifyTranslationAsync(string? translationName ,int? translationId)
         {
             if(translationName != null)
             {
                 translationName = translationName.Trim();
-                if(await _context.Translations.Where(x => x.TranslationName.Equals(translationName)).FirstOrDefaultAsync() != null)
+                var translation = await _context.Translations.Where(x => x.TranslationName.Equals(translationName)).FirstOrDefaultAsync();
+                if (translation != null)
                 {
-                    return new Tuple<bool, string>(true, translationName);
+                    return new Tuple<bool, string, int>(true, translationName, translation.Id);
                 }
-                return new Tuple<bool, string>(false, "No available translation with such name");
+                return new Tuple<bool, string, int>(false, "No available translation with such name", -1);
             }
             if(translationId != null)
             {
                 var translation = await _context.Translations.FindAsync(translationId);
                 if (translation != null)
                 {
-                    return new Tuple<bool, string>(true, translation.TranslationName);
+                    return new Tuple<bool, string, int>(true, translation.TranslationName, translation.Id);
                 }
-                return new Tuple<bool, string>(false, "No available translation with such id");
+                return new Tuple<bool, string, int>(false, "No available translation with such id", -1);
             }
             //Both nulls return default translation without need to call the database
-            return new Tuple<bool, string>(true, ModelConstants.DefaultTranslation);
+            return new Tuple<bool, string, int>(true, ModelConstants.DefaultTranslation, ModelConstants.DefaultTranslationId);
         }
         //Makes sure that given time isn't too different from server time
         protected DateTime AdjustedDateTime(DateTime? dateTime)
@@ -93,7 +98,6 @@ namespace Afs.Translator.Controllers
             }
             return dateTime.Value;
         }
-
         // GET: TranslatorController
         public async Task<ActionResult> Index()
         {
