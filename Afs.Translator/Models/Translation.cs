@@ -9,7 +9,8 @@ namespace Afs.Translator.Models
     {
         public int Id { get; set; }
         [Required]
-        [Range(ModelConstants.ModelTranslationNameLenMin, ModelConstants.ModelTranslationNameLenMax, ErrorMessage = "Length of translation name must be between {1} and {2}")]
+        [MinLength(ModelConstants.ModelTranslationNameLenMin, ErrorMessage = "Minimum required length is {1}")]
+        [MaxLength(ModelConstants.ModelTranslationNameLenMax, ErrorMessage = "Maximum allowed length is {1}")]
         public string TranslationName { get; set; }
     }
 }

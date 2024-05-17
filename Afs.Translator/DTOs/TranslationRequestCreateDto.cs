@@ -13,8 +13,8 @@ namespace Afs.Translator.DTOs
         [FromQuery(Name = "text")]
         /*[BindRequired, Range(ModelConstants.InputTextLenMin, 
             ModelConstants.InputTextLenMax, ErrorMessage = $"Length of the given text must be between 1 and 100") ]*/
-        [MinLength(1, ErrorMessage = "Minimum required length is {1}")]
-        [MaxLength(100, ErrorMessage = "Maxium allowed length is {1}")]
+        [MinLength(ModelConstants.InputTextLenMin, ErrorMessage = "Minimum required length is {1}")]
+        [MaxLength(ModelConstants.InputTextLenMax, ErrorMessage = "Maximum allowed length is {1}")]
         //!@#^*()_=+[]{}:;',.<>/?-
         [RegularExpression(@"^[ -}]+$")]
         public string TextToTranslate { get; set; }
