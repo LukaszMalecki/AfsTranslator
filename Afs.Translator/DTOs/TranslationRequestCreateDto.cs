@@ -23,6 +23,7 @@ namespace Afs.Translator.DTOs
         [FromQuery(Name = "translation_id")]
         public int? TranslationId { get; set; }
         [FromQuery(Name = "translation")]
+        [RegularExpression(@"^[a-z _-]+$", ErrorMessage = ModelConstants.TranslationNameError)]
         public string? TranslationName { get; set; }
     }
 }

@@ -17,5 +17,7 @@
         //Models.Translation
         public const int ModelTranslationNameLenMin = 1;
         public const int ModelTranslationNameLenMax = 50;
+
+        public const string TranslationNameError = "Translation name can only consist of: lowercase characters, space, dash, underscore";
     }
 }

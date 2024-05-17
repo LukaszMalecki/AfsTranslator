@@ -11,7 +11,7 @@ namespace Afs.Translator.Models
         [Required]
         [MinLength(ModelConstants.ModelTranslationNameLenMin, ErrorMessage = "Minimum required length is {1}")]
         [MaxLength(ModelConstants.ModelTranslationNameLenMax, ErrorMessage = "Maximum allowed length is {1}")]
-        [RegularExpression(@"^[a-z _-]+$")]
+        [RegularExpression(@"^[a-z _-]+$", ErrorMessage = ModelConstants.TranslationNameError)]
         public string TranslationName { get; set; }
     }
 }

@@ -69,6 +69,34 @@ namespace Afs.Translator.Tests.Unit
             Assert.Equal(validationResult, isValid);
         }
         [Theory]
+        [InlineData("LeetSpeak", false)]
+        [InlineData("leetspeak", true)]
+        [InlineData("leet-speak", true)]
+        [InlineData("leet_speak", true)]
+        [InlineData("leet speak", true)]
+        [InlineData("leet.speak", false)]
+        public void TranslationRequestCreateDto_DifferentCharacters_AcceptOnlyLowercaseAndSelectSpecialCharacters(string translationName, bool validationResult)
+        {
+            //Arrange
+            string textToTranslate = "aaaa";
+            string translation = translationName;
+            DateTime? requestDate = null;
+            int? translationId = null;
+            var sut = new TranslationRequestCreateDto()
+            {
+                TextToTranslate = textToTranslate,
+                TranslationName = translation,
+                RequestDate = requestDate,
+                TranslationId = translationId
+            };
+            var context = new ValidationContext(sut, null, null);
+            var results = new List<ValidationResult>();
+            //Act
+            var isValid = Validator.TryValidateObject(sut, context, results, true);
+            //Assert
+            Assert.Equal(validationResult, isValid);
+        }
+        [Theory]
         [InlineData(null, false)]
         [InlineData(ModelValidationTestsConstants.text0char, false)]
         [InlineData(ModelValidationTestsConstants.text1char, true)]

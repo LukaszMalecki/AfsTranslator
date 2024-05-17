@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Afs.Translator.Models;
 using Afs.Translator.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace Afs.Translator.Controllers
 {
@@ -30,15 +31,16 @@ namespace Afs.Translator.Controllers
             var x = ModelState;
             if(!ModelState.IsValid)
             {
-                return BadRequest(ModelState.ToDictionary(x => x.Key, x => x.Value.Errors));
+                return BadRequest(ModelState.ToDictionary(x => x.Key, x => x.Value!.Errors));
             }
-            if(!VerifyTranslation(translationRequest, out string verifyResult))
+            Tuple<bool, string> VerificationResult = await VerifyTranslationAsync(translationRequest);
+            if (!VerificationResult.Item1)
             {
-                return BadRequest(verifyResult);
+                return BadRequest(VerificationResult.Item2);
             }
             try
             {
-                var result = await GetTranslatedAsync(translationRequest.TextToTranslate, verifyResult);
+                var result = await GetTranslatedAsync(translationRequest.TextToTranslate, VerificationResult.Item2);
                 return Ok(result.TranslatedText);
             }
             catch (Exception ex) 
@@ -46,19 +48,21 @@ namespace Afs.Translator.Controllers
                 return BadRequest($"{ex.GetType().Name}: {ex.Message}");
             }
         }
-        protected bool VerifyTranslation(TranslationRequestCreateDto translationRequest, out string translation)
+        protected async Task<Tuple<bool, string>> VerifyTranslationAsync(TranslationRequestCreateDto translationRequest)
         {
-            bool isValid = VerifyTranslation(translationRequest.TranslationName, translationRequest.TranslationId, out translation);
-            return isValid;
+            return await VerifyTranslationAsync(translationRequest.TranslationName, translationRequest.TranslationId);
         }
-        protected bool VerifyTranslation(string? translationName ,int? translationId, out string translation)
+        protected async Task<Tuple<bool, string>> VerifyTranslationAsync(string? translationName ,int? translationId)
         {
             //In the future, validation using DbContext
             if(translationName != null)
             {
-                //if(translationName.Equals())
-                translation = translationName;
-                return true;
+                translationName = translationName.Trim();
+                if(await _context.Translations.Where(x => x.TranslationName.Equals(translationName)).FirstOrDefaultAsync() != null)
+                {
+                    return new Tuple<bool, string>(true, translationName);
+                }
+                return new Tuple<bool, string>(false, "No available translation with such name");
             }
             if(translationId != null)
             {
@@ -66,15 +70,12 @@ namespace Afs.Translator.Controllers
                 switch (translationId)
                 {
                     case ModelConstants.DefaultTranslationId:
-                        translation = ModelConstants.DefaultTranslation;
-                        return true;
+                        return new Tuple<bool, string>(true, ModelConstants.DefaultTranslation);
                     default:
-                        translation = "No available translation with such Id";
-                        return false;
+                        return new Tuple<bool, string>(false, "No available translation with such id");
                 }
             }
-            translation = ModelConstants.DefaultTranslation;
-            return true;
+            return new Tuple<bool, string>(true, ModelConstants.DefaultTranslation);
         }
         /*
         public IActionResult TranslateApi([FromQuery] TranslationRequestCreateDto translationRequest)
