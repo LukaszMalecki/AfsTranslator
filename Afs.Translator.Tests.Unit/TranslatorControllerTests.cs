@@ -1,4 +1,5 @@
 ﻿using Afs.Translator.Controllers;
+using Afs.Translator.Data;
 using Afs.Translator.DTOs;
 using Afs.Translator.FunTranslations;
 using Microsoft.AspNetCore.Mvc;
@@ -7,16 +8,28 @@ using Xunit;
 
 namespace Afs.Translator.Tests.Unit
 {
-    public class TranslatorControllerTests
+    public class TranslatorControllerTests : IClassFixture<TestDatabaseFixture>
     {
-        private readonly TranslatorController _sut;
-        public TranslatorControllerTests()
+
+        public TestDatabaseFixture Fixture { get; }
+        private  TranslatorController _sut;
+        public TranslatorControllerTests(TestDatabaseFixture fixture)
         {
+            Fixture = fixture;
+            CreateSut(false);
+        }
+        protected void CreateSut(bool useDatabaseFixture = false)
+        {
+            TranslatorDbContext context = null!;
+            if(useDatabaseFixture)
+            {
+                context = Fixture.CreateContext();
+            }
             _sut = new TranslatorController(
                 new TranslationClient(
                     new HttpClientStub(
                         () => TranslatorControllerTestsConstants.DefaultSuccessResponseMessage)
-                ), null!);
+                ), context);
         }
         [Fact]
         public async Task GetTranslatedAsync_NullTextToTranslate_ArgumentNullException()

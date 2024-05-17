@@ -5,7 +5,7 @@ namespace Afs.Translator.Data
 {
     public class TranslatorDbContext : DbContext
     {
-        public TranslatorDbContext(DbContextOptions<TranslatorDbContext> options) : base(options) { }
+        public TranslatorDbContext(DbContextOptions options) : base(options) { }
         public DbSet<TranslationRequest> TranslationRequests { get; set; }
         public DbSet<TranslationResponse> TranslationResponses { get; set; }
         public DbSet<Translation> Translations { get; set; }

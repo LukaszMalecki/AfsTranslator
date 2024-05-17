@@ -56,6 +56,7 @@ namespace Afs.Translator.Controllers
             //In the future, validation using DbContext
             if(translationName != null)
             {
+                //if(translationName.Equals())
                 translation = translationName;
                 return true;
             }
