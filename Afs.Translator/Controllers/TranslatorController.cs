@@ -45,11 +45,12 @@ namespace Afs.Translator.Controllers
             translationRequest.TranslationId = VerificationResult.Item3;
 
             translationRequest.RequestDate = AdjustedDateTime(translationRequest.RequestDate);
-            var request = AddTranslationRequest(translationRequest);
+            var request = await AddTranslationRequest(translationRequest);
             try
             {
                 var result = await GetTranslatedAsync(translationRequest.TextToTranslate, translationRequest.TranslationName);
-                return Ok(result.TranslatedText);
+                var response = await AddTranslationResponse(result.TranslatedText, request.Id);
+                return Ok(response.TranslatedText);
             }
             catch (Exception ex) 
             {
@@ -113,6 +114,17 @@ namespace Afs.Translator.Controllers
             _context.TranslationRequests.Add(requestItem);
             await _context.SaveChangesAsync();
             return requestItem;
+        }
+        protected async Task<TranslationResponse> AddTranslationResponse(string translated, int translationRequestId)
+        {
+            var responseItem = new TranslationResponse()
+            {
+                TranslatedText = translated,
+                TranslationRequestId = translationRequestId
+            };
+            _context.TranslationResponses.Add(responseItem);
+            await _context.SaveChangesAsync();
+            return responseItem;
         }
         // GET: TranslatorController
         public async Task<ActionResult> Index()

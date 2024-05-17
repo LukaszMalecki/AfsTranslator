@@ -153,11 +153,39 @@ namespace Afs.Translator.Tests.Sintegration
             context.ChangeTracker.Clear();
             int requestCountAfter = context.TranslationRequests.Count();
             var addedItem = context.TranslationRequests.FirstOrDefault(x => x.TextToTranslate.Equals(inputDto.TextToTranslate));
-            
             //Assert
             Assert.NotNull(addedItem);
             Assert.Equal(requestCountBefore + 1, requestCountAfter);
             Assert.Equal(inputDto.TextToTranslate, addedItem.TextToTranslate);
+        }
+        [Fact]
+        public async Task TranslateApiAsync_ModelValid_ItemAddedToDbContextTranslationResponses()
+        {
+            //Arrange
+            (var context, var sut) = ArrangeForTransactionalTests();
+            var textToTranslate = TranslatorControllerTestsConstants.DefaultText;
+            var translation = TranslatorControllerTestsConstants.DefaultTranslation;
+            DateTime? requestDate = null;
+            int? translationId = null;
+            var expectedTranslated = TranslatorControllerTestsConstants.DefaultTranslated;
+            var inputDto = new TranslationRequestCreateDto()
+            {
+                TextToTranslate = textToTranslate,
+                TranslationName = translation,
+                RequestDate = requestDate,
+                TranslationId = translationId
+            };
+            int requestCountBefore = context.TranslationResponses.Count();
+            context.Database.BeginTransaction();
+            //Act
+            var translationResponse = await sut.TranslateApiAsync(inputDto);
+            context.ChangeTracker.Clear();
+            int requestCountAfter = context.TranslationResponses.Count();
+            var addedItem = context.TranslationResponses.FirstOrDefault(x => x.TranslatedText.Equals(expectedTranslated));
+            //Assert
+            Assert.NotNull(addedItem);
+            Assert.Equal(requestCountBefore + 1, requestCountAfter);
+            Assert.Equal(expectedTranslated, addedItem.TranslatedText);
         }
     }
 }
