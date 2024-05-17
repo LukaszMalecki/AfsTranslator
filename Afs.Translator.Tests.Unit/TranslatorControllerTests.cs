@@ -2,6 +2,7 @@
 using Afs.Translator.Data;
 using Afs.Translator.DTOs;
 using Afs.Translator.FunTranslations;
+using Afs.Translator.Wrappers;
 using Microsoft.AspNetCore.Mvc;
 using System.Transactions;
 using Xunit;
@@ -12,13 +13,21 @@ namespace Afs.Translator.Tests.Unit
     {
 
         public TestDatabaseFixture Fixture { get; }
-        private  TranslatorController _sut;
+        private readonly TranslatorController _sut;
+        private readonly TranslatorDbContext _context;
+        private readonly INowWrapper _nowWrapper;
         public TranslatorControllerTests(TestDatabaseFixture fixture)
         {
             Fixture = fixture;
-            CreateSut(true);
+            _context = Fixture.CreateContext();
+            _nowWrapper = new NowWrapperStub(TranslatorControllerTestsConstants.DefaultDateTime);
+            _sut = new TranslatorController(
+                new TranslationClient(
+                    new HttpClientStub(
+                        () => TranslatorControllerTestsConstants.DefaultSuccessResponseMessage)
+                ), _context, _nowWrapper);
         }
-        protected void CreateSut(bool useDatabaseFixture = false)
+        /*protected void CreateSut(bool useDatabaseFixture = false)
         {
             TranslatorDbContext context = null!;
             if(useDatabaseFixture)
@@ -30,7 +39,8 @@ namespace Afs.Translator.Tests.Unit
                     new HttpClientStub(
                         () => TranslatorControllerTestsConstants.DefaultSuccessResponseMessage)
                 ), context);
-        }
+            _context = context;
+        }*/
         [Fact]
         public async Task GetTranslatedAsync_NullTextToTranslate_ArgumentNullException()
         {
@@ -38,9 +48,11 @@ namespace Afs.Translator.Tests.Unit
             string textToTranslate = null!;
             var translation = TranslatorControllerTestsConstants.DefaultTranslation;
             var expectedTranslated = TranslatorControllerTestsConstants.DefaultTranslated;
+            _context.Database.BeginTransaction();
             //Act
             var e = await Record.ExceptionAsync(() =>
                 _sut.GetTranslatedAsync(textToTranslate, translation));
+            _context.ChangeTracker.Clear();
             //Assert
             var ex = Assert.IsType<ArgumentNullException>(e);
             Assert.Equal("textToTranslate", ex.ParamName);
@@ -53,8 +65,10 @@ namespace Afs.Translator.Tests.Unit
             var textToTranslate = TranslatorControllerTestsConstants.DefaultText;
             var translation = TranslatorControllerTestsConstants.DefaultTranslation;
             var expectedTranslated = TranslatorControllerTestsConstants.DefaultTranslated;
+            _context.Database.BeginTransaction();
             //Act
             var translationResponse = await _sut.GetTranslatedAsync(textToTranslate, translation);
+            _context.ChangeTracker.Clear();
             //Assert
             Assert.NotNull(translationResponse);
             Assert.Equal(expectedTranslated, translationResponse.TranslatedText);
@@ -76,8 +90,10 @@ namespace Afs.Translator.Tests.Unit
                 TranslationId = translationId
             };
             _sut.ViewData.ModelState.AddModelError("text", "error");
+            _context.Database.BeginTransaction();
             //Act
             var translationResponse = await _sut.TranslateApiAsync(inputDto);
+            _context.ChangeTracker.Clear();
             //Assert
             Assert.NotNull(translationResponse);
             Assert.IsType<BadRequestObjectResult>(translationResponse);
@@ -106,8 +122,10 @@ namespace Afs.Translator.Tests.Unit
                 RequestDate = requestDate,
                 TranslationId = translationId
             };
+            _context.Database.BeginTransaction();
             //Act
             var translationResponse = await _sut.TranslateApiAsync(inputDto);
+            _context.ChangeTracker.Clear();
             //Assert
             Assert.NotNull(translationResponse);
             if(!isValid)

@@ -13,6 +13,7 @@ namespace Afs.Translator.Tests.Unit
         public const string DefaultText = "Hello World!";
         public const string DefaultTranslation = "leetspeak";
         public const int DefaultTranslationId = 1;
+        public static readonly DateTime DefaultDateTime = new DateTime(2024, 5, 17);
         public static string DefaultResponse = @"{
             ""success"": {
                 ""total"": 1

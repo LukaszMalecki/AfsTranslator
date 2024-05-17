@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Afs.Translator.Models;
 using Afs.Translator.Data;
+using Afs.Translator.Wrappers;
 using Microsoft.EntityFrameworkCore;
 
 namespace Afs.Translator.Controllers
@@ -14,10 +15,12 @@ namespace Afs.Translator.Controllers
     {
         private ITranslationClient _client;
         private readonly TranslatorDbContext _context;
-        public TranslatorController(ITranslationClient client, TranslatorDbContext context) 
+        private readonly INowWrapper _nowWrapper;
+        public TranslatorController(ITranslationClient client, TranslatorDbContext context, INowWrapper nowWrapper) 
         {
             _client = client;
             _context = context;
+            _nowWrapper = nowWrapper;
         }
         [NonAction]
         public async Task<TranslationResponseBriefDto> GetTranslatedAsync(string textToTranslate, string translation)

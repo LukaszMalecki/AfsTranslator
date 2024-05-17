@@ -1,21 +1,27 @@
 using Afs.Translator;
 using Afs.Translator.Data;
 using Afs.Translator.FunTranslations;
+using Afs.Translator.Wrappers;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddSingleton<ITranslationClient>(_ =>
-{
-    bool isStubApi = bool.Parse(builder.Configuration["StubApi:IsActive"]);
-    if (isStubApi)
     {
-        return new TranslationClient(new HttpClientStub(() => Constants.ExampleSuccessResponseMessage));
+        bool isStubApi = bool.Parse(builder.Configuration["StubApi:IsActive"]);
+        if (isStubApi)
+        {
+            return new TranslationClient(new HttpClientStub(() => Constants.ExampleSuccessResponseMessage));
+        }
+        return new TranslationClient(new HttpClientWrapper());
     }
-    return new TranslationClient(new HttpClientWrapper());
-}
-    );
+);
+builder.Services.AddSingleton<INowWrapper>(_ =>
+    {
+        return new NowWrapper();
+    }
+);
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddDbContextPool<TranslatorDbContext>(options =>
