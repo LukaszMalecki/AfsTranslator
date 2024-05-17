@@ -41,6 +41,7 @@ namespace Afs.Translator.Controllers
             {
                 return BadRequest(VerificationResult.Item2);
             }
+            translationRequest.RequestDate = AdjustedDateTime(translationRequest.RequestDate);
             try
             {
                 var result = await GetTranslatedAsync(translationRequest.TextToTranslate, VerificationResult.Item2);
@@ -77,6 +78,20 @@ namespace Afs.Translator.Controllers
             }
             //Both nulls return default translation without need to call the database
             return new Tuple<bool, string>(true, ModelConstants.DefaultTranslation);
+        }
+        //Makes sure that given time isn't too different from server time
+        protected DateTime AdjustedDateTime(DateTime? dateTime)
+        {
+            if(dateTime == null)
+            {
+                return _nowWrapper.Now;
+            }
+            var differenceTolerance = ControllerConstants.DateMaxDifferenceHours;
+            if (dateTime >= _nowWrapper.Now.AddHours(differenceTolerance) || dateTime <= _nowWrapper.Now.AddHours(differenceTolerance))
+            {
+                return _nowWrapper.Now;
+            }
+            return dateTime.Value;
         }
 
         // GET: TranslatorController
