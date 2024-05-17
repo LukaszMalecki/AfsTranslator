@@ -54,7 +54,6 @@ namespace Afs.Translator.Controllers
         }
         protected async Task<Tuple<bool, string>> VerifyTranslationAsync(string? translationName ,int? translationId)
         {
-            //In the future, validation using DbContext
             if(translationName != null)
             {
                 translationName = translationName.Trim();
@@ -66,28 +65,17 @@ namespace Afs.Translator.Controllers
             }
             if(translationId != null)
             {
-                //In the future, validation using DbContext
-                switch (translationId)
+                var translation = await _context.Translations.FindAsync(translationId);
+                if (translation != null)
                 {
-                    case ModelConstants.DefaultTranslationId:
-                        return new Tuple<bool, string>(true, ModelConstants.DefaultTranslation);
-                    default:
-                        return new Tuple<bool, string>(false, "No available translation with such id");
+                    return new Tuple<bool, string>(true, translation.TranslationName);
                 }
+                return new Tuple<bool, string>(false, "No available translation with such id");
             }
+            //Both nulls return default translation without need to call the database
             return new Tuple<bool, string>(true, ModelConstants.DefaultTranslation);
         }
-        /*
-        public IActionResult TranslateApi([FromQuery] TranslationRequestCreateDto translationRequest)
-        {
-            translationRequest.TextToTranslate = "a";
-            if (!ModelState.IsValid)
-            {
-                return BadRequest();
-            }
-            return Ok(translationRequest);
-            //return new JsonResult("aaa");
-        }*/
+
         // GET: TranslatorController
         public async Task<ActionResult> Index()
         {
