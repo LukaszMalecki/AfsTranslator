@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Afs.Translator.Tests.Unit
+namespace Afs.Translator.Tests.Sintegration
 {
     public static class TranslatorControllerTestsConstants
     {

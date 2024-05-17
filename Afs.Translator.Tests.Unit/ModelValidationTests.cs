@@ -21,7 +21,7 @@ namespace Afs.Translator.Tests.Unit
         {
             //Arrange
             string textToTranslate = toTranslate;
-            string translation = TranslatorControllerTestsConstants.DefaultTranslation;
+            string translation = ModelValidationTestsConstants.DefaultTranslation;
             DateTime? requestDate = null;
             int? translationId = null;
             var sut = new TranslationRequestCreateDto()
@@ -51,7 +51,7 @@ namespace Afs.Translator.Tests.Unit
         {
             //Arrange
             string textToTranslate = toTranslate;
-            string translation = TranslatorControllerTestsConstants.DefaultTranslation;
+            string translation = ModelValidationTestsConstants.DefaultTranslation;
             DateTime? requestDate = null;
             int? translationId = null;
             var sut = new TranslationRequestCreateDto()

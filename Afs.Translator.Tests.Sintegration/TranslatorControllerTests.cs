@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Transactions;
 using Xunit;
 
-namespace Afs.Translator.Tests.Unit
+namespace Afs.Translator.Tests.Sintegration
 {
     public class TranslatorControllerTests : IClassFixture<TestDatabaseFixture>
     {

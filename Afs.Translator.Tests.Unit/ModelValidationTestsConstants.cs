@@ -8,6 +8,7 @@ namespace Afs.Translator.Tests.Unit
 {
     public static class ModelValidationTestsConstants
     {
+        public const string DefaultTranslation = "leetspeak";
         public const string text0char = "";
         public const string text1char = "a";
         public const string text50char = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
