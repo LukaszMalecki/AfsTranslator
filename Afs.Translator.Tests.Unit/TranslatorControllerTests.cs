@@ -1,5 +1,7 @@
 ﻿using Afs.Translator.Controllers;
+using Afs.Translator.DTOs;
 using Afs.Translator.FunTranslations;
+using Microsoft.AspNetCore.Mvc;
 using System.Transactions;
 using Xunit;
 
@@ -43,6 +45,29 @@ namespace Afs.Translator.Tests.Unit
             //Assert
             Assert.NotNull(translationResponse);
             Assert.Equal(expectedTranslated, translationResponse.TranslatedText);
+        }
+        [Fact]
+        public async Task TranslateApiAsync_ModelInvalid_BadRequestObjectResult()
+        {
+            //Arrange
+            var textToTranslate = "";
+            var translation = TranslatorControllerTestsConstants.DefaultTranslation;
+            DateTime? requestDate = null;
+            int? translationId = null;
+            var expectedTranslated = TranslatorControllerTestsConstants.DefaultTranslated;
+            var inputDto = new TranslationRequestCreateDto()
+            {
+                TextToTranslate = textToTranslate,
+                TranslationName = translation,
+                RequestDate = requestDate,
+                TranslationId = translationId
+            };
+            _sut.ViewData.ModelState.AddModelError("text", "error");
+            //Act
+            var translationResponse = await _sut.TranslateApiAsync(inputDto);
+            //Assert
+            Assert.NotNull(translationResponse);
+            Assert.IsType<BadRequestObjectResult>(translationResponse);
         }
     }
 }
