@@ -45,10 +45,10 @@ namespace Afs.Translator.Controllers
             translationRequest.TranslationId = VerificationResult.Item3;
 
             translationRequest.RequestDate = AdjustedDateTime(translationRequest.RequestDate);
-
+            var request = AddTranslationRequest(translationRequest);
             try
             {
-                var result = await GetTranslatedAsync(translationRequest.TextToTranslate, VerificationResult.Item2);
+                var result = await GetTranslatedAsync(translationRequest.TextToTranslate, translationRequest.TranslationName);
                 return Ok(result.TranslatedText);
             }
             catch (Exception ex) 
@@ -97,6 +97,22 @@ namespace Afs.Translator.Controllers
                 return _nowWrapper.Now;
             }
             return dateTime.Value;
+        }
+        protected async Task<TranslationRequest> AddTranslationRequest(TranslationRequestCreateDto dto)
+        {
+            return await AddTranslationRequest(dto.TextToTranslate, dto.RequestDate.Value, dto.TranslationId.Value, dto.TranslationName);
+        }
+        protected async Task<TranslationRequest> AddTranslationRequest(string textToTranslate, DateTime requestDate, int translationId, string translationName)
+        {
+            var requestItem = new TranslationRequest()
+            {
+                TextToTranslate = textToTranslate,
+                RequestDate = requestDate,
+                TranslationId = translationId
+            };
+            _context.TranslationRequests.Add(requestItem);
+            await _context.SaveChangesAsync();
+            return requestItem;
         }
         // GET: TranslatorController
         public async Task<ActionResult> Index()
