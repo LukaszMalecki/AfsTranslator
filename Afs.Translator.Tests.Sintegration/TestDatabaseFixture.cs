@@ -50,7 +50,7 @@ namespace Afs.Translator.Tests.Sintegration
             }
             protected override void OnModelCreating(ModelBuilder modelBuilder)
             {
-
+                modelBuilder.SeedLenMax();
             }
         }
     }

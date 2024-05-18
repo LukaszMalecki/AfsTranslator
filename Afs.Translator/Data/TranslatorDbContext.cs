@@ -12,6 +12,7 @@ namespace Afs.Translator.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.SeedLenMax();
             modelBuilder.Seed();
         }
     }
