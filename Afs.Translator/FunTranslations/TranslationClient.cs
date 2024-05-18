@@ -35,14 +35,18 @@ namespace Afs.Translator
                 }
                 return JsonConvert.DeserializeObject<FunTranslationsResponse>(responseContent)!;
             }
-            else if((int)response.StatusCode == Constants.IncorrectTranslationStatusCode)
+            switch ((int)response.StatusCode)
             {
-                throw new ArgumentOutOfRangeException(nameof(translation), "Translation service of such name doesn't exist");
-            }
-            else
-            {
-                var responseContent = await response.Content.ReadAsStringAsync();
-                throw new Exception($"Unhandled exception, content:{responseContent ?? ""}");
+                case Constants.IncorrectTranslationStatusCode:
+                    throw new ArgumentOutOfRangeException(nameof(translation), "Translation service of such name doesn't exist");
+                case Constants.TooManyRequestsStatusCode:
+                    var responseContent = await response.Content.ReadAsStringAsync();
+                    var errorContent = JsonConvert.DeserializeObject<ErrorContent>(responseContent)!;
+                    throw new InvalidOperationException(errorContent.Error.Message);
+                default:
+                    responseContent = await response.Content.ReadAsStringAsync();
+                    errorContent = JsonConvert.DeserializeObject<ErrorContent>(responseContent)!;
+                    throw new InvalidOperationException($"Unknown exception, code: {errorContent.Error.Code}, message: {errorContent.Error.Message}");
             }
         }
         private void Validation(ref string textToTranslate, ref string translation)

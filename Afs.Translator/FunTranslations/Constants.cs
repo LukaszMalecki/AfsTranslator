@@ -14,7 +14,8 @@ namespace Afs.Translator.FunTranslations
         public const string BaseUrl = @"https://api.funtranslations.com/translate";
         public const string TargetFileFormat = ".json";
         public const string QueryTextName = "text";
-        public const int IncorrectTranslationStatusCode = 404;
+        public const int IncorrectTranslationStatusCode = (int)System.Net.HttpStatusCode.NotFound;
+        public const int TooManyRequestsStatusCode = (int)System.Net.HttpStatusCode.TooManyRequests;
         public static string ExampleResponse = @"{
             ""success"": {
                 ""total"": 1

@@ -264,5 +264,25 @@ namespace Afs.Translator.Tests.Unit
             var ex = Assert.IsType<InvalidOperationException>(e);
             Assert.StartsWith("Null", ex.Message);
         }
+
+        [Fact]
+        public async Task TranslateAsync_TooManyRequests_InvalidOperationException()
+        {
+            //Arrange
+            var sut = new TranslationClient(
+                new HttpClientStub(
+                    TranslationClientTestsConstants.DefaultTooManyRequestsResponseMessageFunc
+                    )
+                );
+            var textToTranslate = TranslationClientTestsConstants.DefaultTextToTranslate;
+            var translation = TranslationClientTestsConstants.DefaultTranslation;
+            var expectedResponse = TranslationClientTestsConstants.DefaultDeserializedResponse;
+            //Act
+            var e = await Record.ExceptionAsync(() =>
+                sut.TranslateAsync(textToTranslate, translation));
+            // Assert
+            var ex = Assert.IsType<InvalidOperationException>(e);
+            Assert.StartsWith("Too", ex.Message);
+        }
     }
 }

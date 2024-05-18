@@ -69,5 +69,19 @@ namespace Afs.Translator.Tests.Unit
             Content = new StringContent(DefaultNoTranslationResponse, System.Text.Encoding.UTF8, "application/json")
         };
         public static Func<HttpResponseMessage> DefaultNoTranslationResponseMessageFunc = () => DefaultNoTranslationResponseMessage;
+
+        public static string DefaultTooManyRequestsResponse = @"{
+            ""error"": {
+                ""code"": 429,
+                ""message"": ""Too Many Requests: Rate limit of 10 requests per hour exceeded. Please wait for 54 minutes and 17 seconds.""
+            }
+        }";
+        public static Func<string> DefaultTooManyRequestsResponseFunc = () => DefaultTooManyRequestsResponse;
+        public static HttpResponseMessage DefaultTooManyRequestsResponseMessage = new HttpResponseMessage()
+        {
+            StatusCode = System.Net.HttpStatusCode.TooManyRequests,
+            Content = new StringContent(DefaultTooManyRequestsResponse, System.Text.Encoding.UTF8, "application/json")
+        };
+        public static Func<HttpResponseMessage> DefaultTooManyRequestsResponseMessageFunc = () => DefaultTooManyRequestsResponseMessage;
     }
 }
