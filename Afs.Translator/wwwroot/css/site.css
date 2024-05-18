@@ -16,3 +16,30 @@ html {
 body {
   margin-bottom: 60px;
 }
+.textToTranslate {
+    margin: 0 auto;
+    display: block;
+}
+.textToTranslate .tttLabel{
+    margin: 0 auto;
+    display: block;
+    font-size: 20px;
+    font-weight: bold;
+}
+.textToTranslate .tttInput {
+    margin: 0 auto;
+    display: block;
+}
+.translated {
+    margin: 0 auto;
+    display: block;
+}
+textarea {
+    resize: none;
+    font-size: 20px;
+}
+.block {
+    height: 5px;
+    width: 5px;
+    margin: 0 auto;
+}

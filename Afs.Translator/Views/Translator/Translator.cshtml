@@ -1,0 +1,9 @@
+﻿@model Afs.Translator.ViewModels.TranslationUserViewModel
+@{
+    await Html.RenderPartialAsync("_Translated", Model);
+}
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
