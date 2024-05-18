@@ -18,6 +18,8 @@
         public const int ModelTranslationNameLenMin = 1;
         public const int ModelTranslationNameLenMax = 50;
 
+        public const string TextoToTranslateError = "Only alphanumericals and common special characters are accepted (newline characters are forbidden)";
+        public const string TextToTranslateRegex = @"^[ -~]+$";
         public const string TranslationNameError = "Translation name can only consist of: lowercase characters, space, dash, underscore";
     }
 }

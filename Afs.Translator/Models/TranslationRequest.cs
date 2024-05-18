@@ -9,7 +9,7 @@ namespace Afs.Translator.Models
         //[Range(ModelConstants.ModelTranslationRequestTextLenMin, ModelConstants.ModelTranslationRequestTextLenMax, ErrorMessage = "Length of Text to translate must be between {1} and {2}")]
         [MinLength(ModelConstants.ModelTranslationRequestTextLenMin, ErrorMessage = "Minimum required length is {1}")]
         [MaxLength(ModelConstants.ModelTranslationRequestTextLenMax, ErrorMessage = "Maximum allowed length is {1}")]
-        [RegularExpression(@"^[ -}]+$")]
+        [RegularExpression(ModelConstants.TextToTranslateRegex, ErrorMessage = ModelConstants.TextoToTranslateError)]
         public string TextToTranslate { get; set; }
         [Required]
         public DateTime RequestDate { get; set; }

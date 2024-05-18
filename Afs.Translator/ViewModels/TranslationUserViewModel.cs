@@ -14,11 +14,13 @@ namespace Afs.Translator.ViewModels
         [MinLength(ModelConstants.InputTextLenMin, ErrorMessage = "Minimum required length is {1}")]
         [MaxLength(ModelConstants.InputTextLenMax, ErrorMessage = "Maximum allowed length is {1}")]
         //!@#^*()_=+[]{}:;',.<>/?-
-        [RegularExpression(@"^[ -}]+$")]
+        [RegularExpression(ModelConstants.TextToTranslateRegex, ErrorMessage = ModelConstants.TextoToTranslateError)]
+        [Display(Name = "Text to translate")]
         public string TextToTranslate { get; set; }
         public DateTime? RequestDate { get; set; }
         public int? TranslationId { get; set; }
         [MinLength(1)]
+        [Display(Name = "Translated text")]
         public string? TranslatedText { get; set; }
     }
 }

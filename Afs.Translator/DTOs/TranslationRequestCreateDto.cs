@@ -16,7 +16,7 @@ namespace Afs.Translator.DTOs
         [MinLength(ModelConstants.InputTextLenMin, ErrorMessage = "Minimum required length is {1}")]
         [MaxLength(ModelConstants.InputTextLenMax, ErrorMessage = "Maximum allowed length is {1}")]
         //!@#^*()_=+[]{}:;',.<>/?-
-        [RegularExpression(@"^[ -}]+$")]
+        [RegularExpression(ModelConstants.TextToTranslateRegex, ErrorMessage = ModelConstants.TextoToTranslateError)]
         public string TextToTranslate { get; set; }
         [FromQuery(Name = "date")]
         public DateTime? RequestDate { get; set; }

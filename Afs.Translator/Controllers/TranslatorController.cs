@@ -9,6 +9,7 @@ using Afs.Translator.Data;
 using Afs.Translator.Wrappers;
 using Microsoft.EntityFrameworkCore;
 using Afs.Translator.ViewModels;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace Afs.Translator.Controllers
 {
@@ -32,7 +33,7 @@ namespace Afs.Translator.Controllers
         [HttpGet("[controller]/Translate")]
         public async Task<IActionResult> TranslateApiAsync([FromQuery] TranslationRequestCreateDto translationRequest)
         {
-            var x = ModelState;
+            //var x = ModelState;
             if(!ModelState.IsValid)
             {
                 return BadRequest(ModelState.ToDictionary(x => x.Key, x => x.Value!.Errors));
@@ -127,18 +128,74 @@ namespace Afs.Translator.Controllers
             await _context.SaveChangesAsync();
             return responseItem;
         }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Index([FromForm] TranslationUserViewModel viewModel)
+        {
+            //Console.WriteLine("bylem tu\n\n\tak");
+            if(!ModelState.IsValid)
+            {
+                SetErrorMessage("Unknown error");
+                return RedirectToAction(nameof(Index));
+            }
+            var dto = ViewModelMapper.TranslationUserViewModelToDto(viewModel);
+            var response = await TranslateApiAsync(dto);
+            if(response is BadRequestObjectResult)
+            {
+                var badReq = response as BadRequestObjectResult;
+                SetErrorMessage(badReq.Value.ToString());
+                return RedirectToAction(nameof(Translator), viewModel);
+            }
+            var okRes = response as OkObjectResult;
+            var responseString = okRes!.Value as string;
+            viewModel.TranslatedText = responseString;
+            //viewModel.TranslatedText = viewModel.TextToTranslate;
+            //TempData["translatedText"] = viewModel.TextToTranslate;
+            //ViewBag.viewModel = viewModel;
+            SetErrorMessage(isError: false);
+            return RedirectToAction(nameof(Translator), viewModel);
+            //return viewModel.TranslatedText;
+        }
+        [NonAction]
+        protected void SetErrorMessage(string message = "", bool isError=true)
+        {
+            if(!isError)
+            {
+                ViewBag.ErrorMessage = "";
+                TempData["error"] = "";
+                return;
+            }
+            ViewBag.ErrorMessage = $"Error: {message}";
+            TempData["error"] = $"Error: {message}";
+        }
         // GET: TranslatorController
+        [HttpGet]
         public async Task<ActionResult> Index()
         {
-            var translation = await _context.Translations.FindAsync(1);
-            ViewBag.Test = translation.TranslationName;
-            var viewModel = new TranslationUserViewModel()
-            {
-                TextToTranslate = "",
-                TranslationId = ModelConstants.DefaultTranslationId,
-                TranslatedText = null
-            };
+            var viewModel = PrepareTranslator(null);
             return View(viewModel);
+        }
+        [HttpGet]
+        public async Task<ActionResult> Translator(TranslationUserViewModel viewModel)
+        {
+            viewModel = PrepareTranslator(viewModel);
+            return View(viewModel);
+        }
+        [NonAction]
+        protected TranslationUserViewModel PrepareTranslator(TranslationUserViewModel viewModel)
+        {
+            if (viewModel == null)
+            {
+                viewModel = new TranslationUserViewModel()
+                {
+                    TextToTranslate = "",
+                    TranslationId = ModelConstants.DefaultTranslationId,
+                    TranslatedText = null
+                };
+            }
+            ViewBag.Title = "Leetspeak Translator";
+            ViewBag.ErrorMessage = TempData["error"];
+            return viewModel;
         }
 
         // GET: TranslatorController/Details/5
