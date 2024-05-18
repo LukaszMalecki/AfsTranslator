@@ -1,4 +1,5 @@
-﻿@{
+﻿@model Afs.Translator.ViewModels.TranslationUserViewModel
+@{
     ViewData["Title"] = "Home Page";
 }
 
@@ -6,4 +7,37 @@
     <h1 class="display-4">Welcome</h1>
     <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
     <p>@ViewBag.Test</p>
+    <h4>TranslationUserViewModel</h4>
+    <hr />
+    <div class="row">
+        <div class="col-md-4">
+            <form asp-action="TestView">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <input type="hidden" asp-for="Id" />
+                <div class="form-group">
+                    <label asp-for="TextToTranslate" class="control-label"></label>
+                    <input asp-for="TextToTranslate" class="form-control" />
+                    <span asp-validation-for="TextToTranslate" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="RequestDate" class="control-label"></label>
+                    <input asp-for="RequestDate" class="form-control" />
+                    <span asp-validation-for="RequestDate" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="TranslationId" class="control-label"></label>
+                    <input asp-for="TranslationId" class="form-control" />
+                    <span asp-validation-for="TranslationId" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="TranslatedText" class="control-label"></label>
+                    <input asp-for="TranslatedText" class="form-control" />
+                    <span asp-validation-for="TranslatedText" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <input type="submit" value="Save" class="btn btn-primary" />
+                </div>
+            </form>
+        </div>
+    </div>
 </div>

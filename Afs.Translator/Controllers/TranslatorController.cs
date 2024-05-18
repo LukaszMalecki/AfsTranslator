@@ -8,6 +8,7 @@ using Afs.Translator.Models;
 using Afs.Translator.Data;
 using Afs.Translator.Wrappers;
 using Microsoft.EntityFrameworkCore;
+using Afs.Translator.ViewModels;
 
 namespace Afs.Translator.Controllers
 {
@@ -131,7 +132,13 @@ namespace Afs.Translator.Controllers
         {
             var translation = await _context.Translations.FindAsync(1);
             ViewBag.Test = translation.TranslationName;
-            return View();
+            var viewModel = new TranslationUserViewModel()
+            {
+                TextToTranslate = "",
+                TranslationId = ModelConstants.DefaultTranslationId,
+                TranslatedText = null
+            };
+            return View(viewModel);
         }
 
         // GET: TranslatorController/Details/5

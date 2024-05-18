@@ -1,5 +1,6 @@
 ﻿using Afs.Translator.Models;
 using Microsoft.EntityFrameworkCore;
+using Afs.Translator.ViewModels;
 
 namespace Afs.Translator.Data
 {
@@ -15,5 +16,7 @@ namespace Afs.Translator.Data
             modelBuilder.SeedLenMax();
             modelBuilder.Seed();
         }
+
+        public DbSet<Afs.Translator.ViewModels.TranslationUserViewModel>? TranslationUserViewModel { get; set; }
     }
 }
