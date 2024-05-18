@@ -127,11 +127,13 @@ namespace Afs.Translator.Controllers
         }
         protected async Task<TranslationResponse> AddTranslationResponse(string translated, int translationRequestId)
         {
+            translated = TrimmedToLimit(translated, ModelConstants.ModelTranslationResponseTextLenMax);
             var responseItem = new TranslationResponse()
             {
                 TranslatedText = translated,
                 TranslationRequestId = translationRequestId
             };
+
             _context.TranslationResponses.Add(responseItem);
             try
             {
@@ -142,6 +144,12 @@ namespace Afs.Translator.Controllers
                 throw new Exception($"Internal database problem, {e.Message}");
             }
             return responseItem;
+        }
+        protected string TrimmedToLimit(string text, int maxLen)
+        {
+            if(text.Length <= maxLen)
+                return text;
+            return text.Substring(0, maxLen);
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
