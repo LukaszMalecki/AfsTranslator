@@ -14,7 +14,8 @@ builder.Services.AddSingleton<ITranslationClient>(_ =>
         {
             return new TranslationClient(new HttpClientStub(() => Constants.ExampleSuccessResponseMessage));
         }
-        return new TranslationClient(new HttpClientWrapper());
+        string apiKey = builder.Configuration["ApiKey:Key"];
+        return new TranslationClient(new HttpClientWrapper(), apiKey);
     }
 );
 builder.Services.AddSingleton<INowWrapper>(_ =>

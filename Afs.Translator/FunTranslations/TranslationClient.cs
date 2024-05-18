@@ -8,9 +8,11 @@ namespace Afs.Translator
     public class TranslationClient:ITranslationClient
     {
         private readonly IHttpClientWrapper _client;
-        public TranslationClient(IHttpClientWrapper httpClient)
+        private string? _apiKey = null;
+        public TranslationClient(IHttpClientWrapper httpClient, string? apiKey = null)
         {
             _client = httpClient;
+            _apiKey = apiKey;
         }
 
         public async Task<FunTranslationsResponse> TranslateAsync(string textToTranslate, string translation)
@@ -19,6 +21,10 @@ namespace Afs.Translator
             UriBuilder uriBuilder = new UriBuilder($"{Constants.BaseUrl}/{translation}{Constants.TargetFileFormat}");
             NameValueCollection nameValueCollection = HttpUtility.ParseQueryString("");
             nameValueCollection[Constants.QueryTextName] = textToTranslate;
+            if(!String.IsNullOrEmpty(_apiKey)) 
+            {
+                nameValueCollection[Constants.QueryApiName] = _apiKey;
+            }
             uriBuilder.Query = nameValueCollection.ToString();
 
             var response = await _client.GetAsync(uriBuilder.Uri.AbsoluteUri);
