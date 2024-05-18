@@ -187,5 +187,32 @@ namespace Afs.Translator.Tests.Sintegration
             Assert.Equal(requestCountBefore + 1, requestCountAfter);
             Assert.Equal(expectedTranslated, addedItem.TranslatedText);
         }
+        [Fact]
+        public async Task TranslateApiAsync_ModelValidDateNull_RequestAddedToDbHasCurrentDate()
+        {
+            //Arrange
+            (var context, var sut) = ArrangeForTransactionalTests();
+            var textToTranslate = TranslatorControllerTestsConstants.DefaultText;
+            var translation = TranslatorControllerTestsConstants.DefaultTranslation;
+            DateTime? requestDate = null;
+            int? translationId = null;
+            var expectedTranslated = TranslatorControllerTestsConstants.DefaultTranslated;
+            var inputDto = new TranslationRequestCreateDto()
+            {
+                TextToTranslate = textToTranslate,
+                TranslationName = translation,
+                RequestDate = requestDate,
+                TranslationId = translationId
+            };
+            int requestCountBefore = context.TranslationRequests.Count();
+            context.Database.BeginTransaction();
+            //Act
+            var translationResponse = await sut.TranslateApiAsync(inputDto);
+            context.ChangeTracker.Clear();
+            var addedItem = context.TranslationRequests.FirstOrDefault(x => x.TextToTranslate.Equals(inputDto.TextToTranslate));
+            //Assert
+            Assert.NotNull(addedItem);
+            Assert.Equal(_nowWrapper.Now, addedItem.RequestDate);
+        }
     }
 }

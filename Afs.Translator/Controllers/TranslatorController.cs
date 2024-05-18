@@ -10,6 +10,7 @@ using Afs.Translator.Wrappers;
 using Microsoft.EntityFrameworkCore;
 using Afs.Translator.ViewModels;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using System.Diagnostics;
 
 namespace Afs.Translator.Controllers
 {
@@ -114,7 +115,14 @@ namespace Afs.Translator.Controllers
                 TranslationId = translationId
             };
             _context.TranslationRequests.Add(requestItem);
-            await _context.SaveChangesAsync();
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch(Exception e)
+            {
+                throw new Exception($"Internal database problem, {e.Message}");
+            }
             return requestItem;
         }
         protected async Task<TranslationResponse> AddTranslationResponse(string translated, int translationRequestId)
@@ -125,14 +133,20 @@ namespace Afs.Translator.Controllers
                 TranslationRequestId = translationRequestId
             };
             _context.TranslationResponses.Add(responseItem);
-            await _context.SaveChangesAsync();
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception e)
+            {
+                throw new Exception($"Internal database problem, {e.Message}");
+            }
             return responseItem;
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Index([FromForm] TranslationUserViewModel viewModel)
         {
-            //Console.WriteLine("bylem tu\n\n\tak");
             if(!ModelState.IsValid)
             {
                 SetErrorMessage("Unknown error");
@@ -149,12 +163,8 @@ namespace Afs.Translator.Controllers
             var okRes = response as OkObjectResult;
             var responseString = okRes!.Value as string;
             viewModel.TranslatedText = responseString;
-            //viewModel.TranslatedText = viewModel.TextToTranslate;
-            //TempData["translatedText"] = viewModel.TextToTranslate;
-            //ViewBag.viewModel = viewModel;
             SetErrorMessage(isError: false);
             return RedirectToAction(nameof(Translator), viewModel);
-            //return viewModel.TranslatedText;
         }
         [NonAction]
         protected void SetErrorMessage(string message = "", bool isError=true)
@@ -265,6 +275,11 @@ namespace Afs.Translator.Controllers
             {
                 return View();
             }
+        }
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+        public IActionResult Error()
+        {
+            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
     }
 }
